@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp" android:height="28dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <!-- тело пина -->
+    <path android:fillColor="#6A5AE0"
+        android:pathData="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7,-7.75 7,-13c0,-3.87 -3.13,-7 -7,-7z"/>
+    <!-- кружок в центре -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M12,7a2,2 0 1 1 0,4a2,2 0 0 1 0,-4z"/>
+</vector>

@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_news"
+        android:title="Новости"
+        android:icon="@drawable/ic_nav_news" />
 
+    <item
+        android:id="@+id/nav_map"
+        android:title="Карта"
+        android:icon="@drawable/ic_nav_map" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:title="Кабинет"
+        android:icon="@drawable/ic_nav_profile" />
 </menu>

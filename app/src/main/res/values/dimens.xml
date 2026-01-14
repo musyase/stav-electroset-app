@@ -1,3 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- запас под BottomNavigation + жестовую панель -->
+    <dimen name="register_bottom_inset">128dp</dimen>
+    <dimen name="screen_padding">16dp</dimen>
+    <dimen name="card_padding">20dp</dimen>
+    <dimen name="field_spacing">12dp</dimen>
+    <dimen name="section_spacing">20dp</dimen>
+    <dimen name="btn_radius">28dp</dimen>
+    <dimen name="auth_max_width">420dp</dimen>
+    <dimen name="bnv_height">80dp</dimen>
 </resources>

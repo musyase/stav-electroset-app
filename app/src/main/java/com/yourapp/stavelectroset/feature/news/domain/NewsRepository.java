@@ -1,36 +1,49 @@
 package com.yourapp.stavelectroset.feature.news.domain;
 
-import androidx.lifecycle.LiveData;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
-
-import retrofit2.Retrofit;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 
 import com.yourapp.stavelectroset.feature.news.data.local.NewsDao;
 import com.yourapp.stavelectroset.feature.news.data.local.NewsEntity;
 import com.yourapp.stavelectroset.feature.news.data.remote.NewsLoader;
 
-public final class NewsRepository {
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class NewsRepository {
+    private static final String TAG = "NewsRepository";
+
     private final NewsDao dao;
     private final NewsLoader loader;
+    private final Executor io = Executors.newSingleThreadExecutor();
+    private final Handler main = new Handler(Looper.getMainLooper());
 
-    public NewsRepository(NewsDao dao, Retrofit retrofit) {
+    public NewsRepository(NewsDao dao, NewsLoader loader, ExecutorService io) {
         this.dao = dao;
-        this.loader = new NewsLoader(retrofit);
+        this.loader = loader;
     }
 
-    public LiveData<List<NewsEntity>> observe() { return dao.observeAll(); }
+    public androidx.lifecycle.LiveData<java.util.List<NewsEntity>> observeAll() {
+        return dao.observeAll();
+    }
 
-    public void refresh() {
-        Executors.newSingleThreadExecutor().execute(() -> {
+    /** onFinish вызывается ВСЕГДА (и при успехе, и при ошибке) */
+    public void refresh(Runnable onFinish) {
+        io.execute(() -> {
             try {
-                List<NewsEntity> list = loader.load();
-                if (list == null) list = new ArrayList<>();
-                dao.upsertAll(list);
-            } catch (Exception e) {
-                e.printStackTrace();
+                List<NewsEntity> items = loader.load();  // тут сеть/парсинг
+                if (items != null && !items.isEmpty()) {
+                    dao.upsertAll(items);
+                } else {
+                    Log.w(TAG, "refresh: loaded empty list");
+                }
+            } catch (Throwable t) {
+                Log.e(TAG, "refresh failed", t);
+            } finally {
+                if (onFinish != null) main.post(onFinish);
             }
         });
     }

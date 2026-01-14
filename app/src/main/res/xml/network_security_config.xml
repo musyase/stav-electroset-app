@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
-</PreferenceScreen>
+<network-security-config>
+    <!-- Разрешаем http для наших доменов. Добавь/поменяй на свои. -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">stavels.ru</domain>
+        <domain includeSubdomains="true">www.stavels.ru</domain>
+        <!-- Если у тебя другой источник новостей — впиши его здесь -->
+    </domain-config>
+</network-security-config>

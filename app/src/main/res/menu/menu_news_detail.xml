@@ -4,9 +4,9 @@
     <item
         android:id="@+id/action_open"
         android:title="Открыть в браузере"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_share"
         android:title="Поделиться"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 </menu>

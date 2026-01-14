@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Фон: сложенная карта -->
+    <path
+        android:fillAlpha="0.9"
+        android:fillColor="@android:color/black"
+        android:pathData="M3,6 L10,4 L14,6 L21,4 L21,18 L14,20 L10,18 L3,20 Z" />
+
+    <!-- Линии сгиба карты -->
+    <path
+        android:fillColor="@android:color/black"
+        android:fillAlpha="0.6"
+        android:pathData="M10,4 L10,18" />
+
+    <path
+        android:fillColor="@android:color/black"
+        android:fillAlpha="0.6"
+        android:pathData="M14,6 L14,20" />
+
+    <!-- Круглая часть пина -->
+    <path
+        android:fillColor="@android:color/black"
+        android:pathData="M12,8
+                          a3,3 0 1,1 0,6
+                          a3,3 0 1,1 0,-6" />
+
+    <!-- Хвост пина -->
+    <path
+        android:fillColor="@android:color/black"
+        android:pathData="M12,14 L10.5,17.5 L13.5,17.5 Z" />
+</vector>
