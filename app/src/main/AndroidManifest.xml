@@ -1,9 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yourapp.stavelectroset">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name=".App"
@@ -12,19 +13,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.Material3.DayNight.NoActionBar">
+        android:enableOnBackInvokedCallback="true"
+        android:theme="@style/Theme.Stavelectroset"
+        tools:targetApi="33">
 
         <meta-data
             android:name="com.yandex.maps.apikey"
-            android:value="@string/yandex_mapkit_api_key"/>
+            android:value="@string/yandex_mapkit_api_key" />
 
-
-        <!-- экран детали новости не должен быть доступен извне -->
         <activity
             android:name=".feature.news.ui.NewsDetailActivity"
             android:exported="false" />
 
-        <!-- лаунчер-активити должна быть exported=true -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -34,31 +34,137 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".feature.news.auth.data.local.ui.RegisterActivity"/>
-        <activity android:name=".feature.news.auth.data.local.ui.ProfileActivity"/>
-        <activity android:name=".feature.news.auth.data.local.ui.LoginActivity"/>
+        <!-- Auth -->
         <activity
-            android:name=".feature.news.admin.ui.AdminPanelActivity"
-            android:label="Админ-панель"
+            android:name=".feature.news.auth.data.local.ui.RegisterActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.LoginActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.ProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.ResetPasswordActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+
+            <!-- 1) custom scheme -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="stavelectroset"
+                    android:host="auth"
+                    android:path="/callback" />
+            </intent-filter>
+
+            <!-- 2) https supabase verify link (ВАЖНО: host = твой projectRef.supabase.co) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="ajwtlftmwnjygdyhsjlh.supabase.co"
+                    android:pathPrefix="/auth/v1/verify" />
+            </intent-filter>
+
+        </activity>
+
+        <!-- Web -->
         <activity
             android:name=".web.WebPageActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.AuthCallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="stavelectroset"
+                    android:host="auth"
+                    android:path="/callback" />
+            </intent-filter>
+        </activity>
+
+        <!-- Consumers -->
         <activity
             android:name=".feature.news.consumers.RepairsActivity"
+            android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".feature.news.consumers.ConsumersMapActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name" />
+
         <activity
-            android:name=".feature.news.admin.ui.AdminUsersActivity"
-            android:exported="false" />
-        <activity
-            android:name=".feature.news.admin.ui.AdminCertificatesActivity"
+            android:name=".feature.news.auth.data.local.ui.RequestActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".feature.news.auth.data.local.ui.ComplaintActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.RequestCreateActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.ComplaintCreateActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.AdminDashboardActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.RoleManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.AdminRequestsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.AdminComplaintsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.AttachmentViewerActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.RequestDetailsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.ComplaintDetailsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.ProfileSettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.AdminInfoLettersActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.news.auth.data.local.ui.InfoLettersActivity"
+            android:exported="false" />
 
     </application>
 </manifest>

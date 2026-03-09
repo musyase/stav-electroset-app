@@ -1,8 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- скругления у карточек -->
+
+    <!-- ========================================================= -->
+    <!-- BASE STYLE NODES                                           -->
+    <!-- ВАЖНО: они нужны, чтобы AAPT не искал несуществующих       -->
+    <!-- родителей у стилей вида TextAppearance.App.* / Widget.App.* -->
+    <!-- ========================================================= -->
+
+    <style name="TextAppearance.App" parent="" />
+    <style name="Widget.App" parent="" />
+    <style name="Widget.App.Button" parent="" />
+
+    <!-- ========================================================= -->
+    <!-- SHAPES                                                     -->
+    <!-- ========================================================= -->
+
     <style name="ShapeAppearanceOverlay.App.AuthCard" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">24dp</item>
+        <item name="cornerSize">@dimen/auth_card_radius</item>
     </style>
+
+    <!-- ========================================================= -->
+    <!-- TEXT                                                       -->
+    <!-- ========================================================= -->
+
+    <style name="TextAppearance.App.TitleLarge" parent="">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.App.TitleMedium" parent="">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.App.TitleSmall" parent="">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.App.BodyLarge" parent="">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.App.BodyMedium" parent="">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.App.BodySecondary" parent="">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.App.Label" parent="">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.App.Meta" parent="">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/app_text_tertiary</item>
+    </style>
+
+    <style name="TextAppearance.App.Subtitle" parent="">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- TOOLBAR                                                    -->
+    <!-- ========================================================= -->
+
+    <style name="Widget.App.Toolbar" parent="">
+        <item name="android:background">@color/app_surface</item>
+        <item name="titleTextColor">@color/app_text_primary</item>
+        <item name="subtitleTextColor">@color/app_text_secondary</item>
+        <item name="android:minHeight">@dimen/toolbar_height</item>
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- CARDS                                                      -->
+    <!-- ========================================================= -->
+
+    <style name="Widget.App.Card" parent="">
+        <item name="cardBackgroundColor">@color/app_card</item>
+        <item name="cardCornerRadius">@dimen/card_radius</item>
+        <item name="strokeColor">@color/app_outline</item>
+        <item name="strokeWidth">@dimen/stroke_thin</item>
+        <item name="cardElevation">0dp</item>
+        <item name="rippleColor">@color/app_ripple</item>
+    </style>
+
+    <style name="Widget.App.Card.Section" parent="Widget.App.Card">
+        <item name="android:layout_marginTop">@dimen/space_16</item>
+    </style>
+
+    <style name="Widget.App.AuthCard" parent="Widget.App.Card">
+        <item name="cardCornerRadius">@dimen/auth_card_radius</item>
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- BUTTONS                                                    -->
+    <!-- ========================================================= -->
+
+    <style name="Widget.App.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/app_on_primary</item>
+        <item name="backgroundTint">@color/app_primary</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+    </style>
+
+    <style name="Widget.App.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+        <item name="backgroundTint">@color/app_surface</item>
+        <item name="strokeColor">@color/app_outline</item>
+        <item name="strokeWidth">@dimen/stroke_thin</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+    </style>
+
+    <style name="Widget.App.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/app_on_primary_container</item>
+        <item name="backgroundTint">@color/app_primary_container</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+    </style>
+
+    <style name="Widget.App.Button.DangerOutlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/app_error</item>
+        <item name="backgroundTint">@color/app_surface</item>
+        <item name="strokeColor">@color/app_error</item>
+        <item name="strokeWidth">@dimen/stroke_thin</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- TEXT INPUT                                                 -->
+    <!-- ========================================================= -->
+
+    <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/app_surface</item>
+        <item name="boxStrokeColor">@color/app_outline</item>
+        <item name="boxStrokeWidth">@dimen/stroke_thin</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="hintTextColor">@color/app_text_secondary</item>
+        <item name="endIconTint">@color/app_text_secondary</item>
+    </style>
+
+    <style name="Widget.App.TextInputEditText" parent="">
+        <item name="android:textColor">@color/app_text_primary</item>
+        <item name="android:textColorHint">@color/app_text_secondary</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- BOTTOM NAV                                                 -->
+    <!-- ========================================================= -->
+
+    <style name="Widget.App.BottomNavigation" parent="">
+        <item name="android:background">@drawable/bg_bottom_nav_floating</item>
+        <item name="itemIconTint">@color/bnv_icon_tint</item>
+        <item name="itemTextColor">@color/bnv_icon_tint</item>
+        <item name="itemIconSize">@dimen/bottom_nav_icon_size</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
 </resources>

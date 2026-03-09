@@ -3,32 +3,39 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/app_bg">
 
     <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="@color/app_surface"
+        android:elevation="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:liftOnScroll="true">
+        app:liftOnScroll="true"
+        app:liftOnScrollTargetViewId="@id/recycler">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="Новости"
-            app:titleCentered="true"/>
+            android:layout_height="@dimen/toolbar_height"
+            android:background="@color/app_surface"
+            app:title="@string/news_title"
+            app:titleCentered="true"
+            app:titleTextColor="@color/app_text_primary" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- КОНТЕЙНЕР НОВОСТЕЙ (как раньше) -->
+    <!-- КОНТЕЙНЕР НОВОСТЕЙ -->
     <FrameLayout
         android:id="@+id/news_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/app_bg"
         app:layout_constraintTop_toBottomOf="@id/appBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,45 +51,75 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"/>
+                android:paddingStart="@dimen/screen_padding_horizontal"
+                android:paddingEnd="@dimen/screen_padding_horizontal"
+                android:paddingTop="@dimen/space_12"
+                android:paddingBottom="@dimen/space_20" />
+
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        <!-- индикатор загрузки -->
+        <!-- Индикатор загрузки -->
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:indeterminate="true"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:indicatorColor="@color/app_primary" />
 
-        <!-- пустое состояние -->
+        <!-- Пустое состояние -->
         <LinearLayout
             android:id="@+id/emptyView"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="24dp"
-            android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/space_24"
+            android:visibility="gone">
 
-            <TextView
-                android:id="@+id/stateText"
-                android:text="Нет данных"
-                android:textSize="16sp"
-                android:paddingBottom="12dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/stateRetry"
-                android:layout_width="wrap_content"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Повторите попытку"/>
+                android:layout_gravity="center"
+                android:maxWidth="@dimen/state_content_max_width"
+                app:cardBackgroundColor="@color/app_surface"
+                app:cardCornerRadius="@dimen/dialog_corner_radius"
+                app:strokeColor="@color/app_outline"
+                app:strokeWidth="@dimen/stroke_thin">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="@dimen/dialog_padding">
+
+                    <TextView
+                        android:id="@+id/stateText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/space_12"
+                        android:text="@string/empty_state_no_data"
+                        android:textAlignment="center"
+                        android:textColor="@color/app_text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/stateRetry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/button_height_small"
+                        android:text="@string/empty_state_retry"
+                        app:cornerRadius="@dimen/radius_button" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
+
     </FrameLayout>
 
     <!-- КОНТЕЙНЕР ДЛЯ КАРТЫ/ДРУГИХ ФРАГМЕНТОВ -->
@@ -90,24 +127,30 @@
         android:id="@+id/main_nav_host"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/app_bg"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/appBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav"/>
+        app:layout_constraintBottom_toTopOf="@id/bottomNav" />
 
     <!-- НИЖНЕЕ МЕНЮ -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:layout_height="@dimen/bottom_nav_height"
+        android:layout_marginStart="@dimen/bottom_nav_horizontal_margin"
+        android:layout_marginEnd="@dimen/bottom_nav_horizontal_margin"
+        android:layout_marginBottom="@dimen/bottom_nav_bottom_margin"
+        android:background="@drawable/bg_bottom_nav_floating"
+        android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:labelVisibilityMode="labeled"
+        app:itemIconSize="@dimen/bottom_nav_icon_size"
         app:itemIconTint="@color/bnv_icon_tint"
         app:itemTextColor="@color/bnv_icon_tint"
-        app:menu="@menu/menu_bottom_nav"/>
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/menu_bottom_nav" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

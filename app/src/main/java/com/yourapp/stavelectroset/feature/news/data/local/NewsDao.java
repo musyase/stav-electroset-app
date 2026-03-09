@@ -2,15 +2,16 @@ package com.yourapp.stavelectroset.feature.news.data.local;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.Upsert;              // <-- важно импортировать
 
 import java.util.List;
 
 @Dao
 public interface NewsDao {
 
-    @Upsert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsertAll(List<NewsEntity> list);
 
     @Query("SELECT * FROM news ORDER BY dateUtc DESC")

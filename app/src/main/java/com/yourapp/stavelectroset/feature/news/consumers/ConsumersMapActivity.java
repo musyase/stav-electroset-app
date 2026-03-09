@@ -13,6 +13,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.view.ViewGroup;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -22,13 +24,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.button.MaterialButton;
 import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.geometry.BoundingBox;
@@ -43,8 +45,13 @@ import com.yandex.mapkit.map.PlacemarkMapObject;
 import com.yandex.mapkit.mapview.MapView;
 import com.yandex.mapkit.user_location.UserLocationLayer;
 import com.yandex.runtime.image.ImageProvider;
-
+import com.yourapp.stavelectroset.BuildConfig;
+import com.yourapp.stavelectroset.MainActivity;
 import com.yourapp.stavelectroset.R;
+import com.yourapp.stavelectroset.di.ServiceLocator;
+import com.yourapp.stavelectroset.feature.news.auth.data.local.domain.AuthRepository;
+import com.yourapp.stavelectroset.feature.news.auth.data.local.ui.LoginActivity;
+import com.yourapp.stavelectroset.feature.news.auth.data.local.ui.ProfileActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,47 +60,48 @@ public class ConsumersMapActivity extends AppCompatActivity {
 
     private static final String TAG = "ConsumersMapActivity";
 
-    // ---- ДАННЫЕ ГЛАВНОГО ФИЛИАЛА ----
-    private static final Point HQ_PT    = new Point(45.017308, 41.938622);
-    private static final String HQ_TITLE = "АО «Ставэлектросеть»";
-    private static final String HQ_ADDR  = "Ставропольский край, г. Ставрополь, ул. Шпаковская, д. 76/6";
-    private static final String HQ_PHONE = "+7 (8652) 74-88-01";
-    private static final String HQ_SITE  = "https://stavels.ru";
+    private static boolean MAPKIT_INITIALIZED = false;
 
-    // Карта
+    private static final Point HQ_PT = new Point(45.017308, 41.938622);
+    private static final String HQ_TITLE = "АО «Ставэлектросеть»";
+    private static final String HQ_ADDR = "Ставропольский край, г. Ставрополь, ул. Шпаковская, д. 76/6";
+    private static final String HQ_PHONE = "+7 (8652) 74-88-01";
+    private static final String HQ_SITE = "https://stavels.ru";
+
     private MapView mapView;
     private Map yandexMap;
     private MapObjectCollection mapObjects;
 
-    // Филиалы и маркеры
     private final List<Branch> branches = new ArrayList<>();
     @Nullable
     private Branch currentBranch;
     private MapObjectTapListener branchTapListener;
 
-    // Геолокация
     private FusedLocationProviderClient fused;
     @Nullable
     private Point myPoint;
     @Nullable
     private UserLocationLayer userLocationLayer;
 
-    // BottomSheet
     private BottomSheetBehavior<View> sheetBehavior;
     private View branchSheet;
     private TextView sheetTitle;
     private TextView sheetAddress;
     private TextView sheetDesc;
 
-    // Разрешения
     private ActivityResultLauncher<String[]> locationPermLauncher;
 
-    // -------------------- ЖИЗНЕННЫЙ ЦИКЛ --------------------
+    private AuthRepository authRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ensureMapKitInitialized();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consumers_map);
+
+        ServiceLocator sl = ServiceLocator.get(getApplicationContext());
+        authRepository = sl.authRepository();
 
         setupToolbar();
         setupMap();
@@ -101,6 +109,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
         setupBottomSheet();
         setupSheetButtons();
         setupFabs();
+        initBottomNav();
         initLocationPermissionLauncher();
         requestLocationPermissionsIfNeeded();
         addBranchMarkers();
@@ -112,27 +121,100 @@ public class ConsumersMapActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         MapKitFactory.getInstance().onStart();
-        mapView.onStart();
+        if (mapView != null) mapView.onStart();
     }
 
     @Override
     protected void onStop() {
-        mapView.onStop();
+        if (mapView != null) mapView.onStop();
         MapKitFactory.getInstance().onStop();
         super.onStop();
     }
 
-    // -------------------- ИНИЦИАЛИЗАЦИЯ UI / КАРТЫ --------------------
+    private void ensureMapKitInitialized() {
+        if (MAPKIT_INITIALIZED) return;
+
+        try {
+            String apiKey = getString(R.string.yandex_mapkit_api_key);
+
+            if (!TextUtils.isEmpty(apiKey)) {
+                MapKitFactory.setApiKey(apiKey);
+            }
+            MapKitFactory.initialize(getApplicationContext());
+            MAPKIT_INITIALIZED = true;
+
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) {
+                Log.w(TAG, "MapKit init failed: " + e.getMessage());
+            }
+        }
+    }
 
     private void setupToolbar() {
         MaterialToolbar tb = findViewById(R.id.toolbar);
         if (tb != null) {
-            tb.setNavigationOnClickListener(v -> finish());
+            setSupportActionBar(tb);
+            setTitle("Карта филиалов");
+        }
+    }
+
+    private void initBottomNav() {
+        bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav == null) return;
+
+        setBottomNavVisible(true, false);
+
+        bottomNav.setSelectedItemId(R.id.nav_map);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_news) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_map) {
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                openProfileOrLogin();
+                return true;
+            }
+
+            return false;
+        });
+
+        bottomNav.setOnItemReselectedListener(item -> {
+            // top-level экран, ничего не делаем
+        });
+    }
+
+    private void openProfileOrLogin() {
+        try {
+            boolean loggedIn = authRepository != null && authRepository.isLoggedIn();
+            Intent i = loggedIn
+                    ? new Intent(this, ProfileActivity.class)
+                    : new Intent(this, LoginActivity.class);
+
+            startActivity(i);
+            finish();
+        } catch (Exception e) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
         }
     }
 
     private void setupMap() {
-        mapView   = findViewById(R.id.mapView);
+        mapView = findViewById(R.id.mapView);
+        if (mapView == null) {
+            toast("Ошибка: mapView не найден в layout");
+            finish();
+            return;
+        }
+
         yandexMap = mapView.getMapWindow().getMap();
         mapObjects = yandexMap.getMapObjects();
 
@@ -141,64 +223,106 @@ public class ConsumersMapActivity extends AppCompatActivity {
 
     private void setupBottomSheet() {
         branchSheet = findViewById(R.id.branchSheet);
+        if (branchSheet == null) {
+            toast("Ошибка: branchSheet не найден в layout");
+            return;
+        }
+
         sheetBehavior = BottomSheetBehavior.from(branchSheet);
-        sheetTitle   = findViewById(R.id.sheetTitle);
+        sheetTitle = findViewById(R.id.sheetTitle);
         sheetAddress = findViewById(R.id.sheetAddress);
-        sheetDesc    = findViewById(R.id.sheetDesc);
+        sheetDesc = findViewById(R.id.sheetDesc);
 
         sheetBehavior.setHideable(true);
-        sheetBehavior.setSkipCollapsed(true); // только HIDDEN и EXPANDED
+        sheetBehavior.setSkipCollapsed(true);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        // Когда sheet скрыт — держим нижний отступ под bottom nav
+        updateBranchSheetBottomMargin(true);
+
+
+        sheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    updateBranchSheetBottomMargin(true);
+                    setBottomNavVisible(true, true);
+                    return;
+                }
+
+                if (newState == BottomSheetBehavior.STATE_EXPANDED
+                        || newState == BottomSheetBehavior.STATE_DRAGGING
+                        || newState == BottomSheetBehavior.STATE_SETTLING) {
+                    updateBranchSheetBottomMargin(false);
+                    setBottomNavVisible(false, true);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                // здесь специально ничего не делаем,
+                // чтобы не дергать анимацию на каждом пикселе
+            }
+        });
     }
 
     private void setupSheetButtons() {
         MaterialButton btnRoute = findViewById(R.id.btnRoute);
-        MaterialButton btnCall  = findViewById(R.id.btnCall);
-        MaterialButton btnSite  = findViewById(R.id.btnSite);
+        MaterialButton btnCall = findViewById(R.id.btnCall);
+        MaterialButton btnSite = findViewById(R.id.btnSite);
 
-        // "Маршрут" — во внешние карты
-        btnRoute.setOnClickListener(v -> {
-            Branch target = currentBranch != null
-                    ? currentBranch
-                    : (!branches.isEmpty() ? branches.get(0) : null);
+        if (btnRoute != null) {
+            btnRoute.setOnClickListener(v -> {
+                Branch target = currentBranch != null
+                        ? currentBranch
+                        : (!branches.isEmpty() ? branches.get(0) : null);
 
-            if (target != null) {
-                openExternalRoute(target);
-            }
-        });
+                if (target != null) {
+                    openExternalRoute(target);
+                }
+            });
+        }
 
-        // "Звонок"
-        btnCall.setOnClickListener(v -> {
-            Branch target = currentBranch != null
-                    ? currentBranch
-                    : (!branches.isEmpty() ? branches.get(0) : null);
+        if (btnCall != null) {
+            btnCall.setOnClickListener(v -> {
+                Branch target = currentBranch != null
+                        ? currentBranch
+                        : (!branches.isEmpty() ? branches.get(0) : null);
 
-            if (target == null || TextUtils.isEmpty(target.phone)) return;
+                if (target == null || TextUtils.isEmpty(target.phone)) return;
 
-            Uri telUri = Uri.parse("tel:" + target.phone);
-            startActivity(new Intent(Intent.ACTION_DIAL, telUri));
-        });
+                Uri telUri = Uri.parse("tel:" + target.phone);
+                startActivity(new Intent(Intent.ACTION_DIAL, telUri));
+            });
+        }
 
-        // "Сайт"
-        btnSite.setOnClickListener(v -> {
-            Branch target = currentBranch != null
-                    ? currentBranch
-                    : (!branches.isEmpty() ? branches.get(0) : null);
+        if (btnSite != null) {
+            btnSite.setOnClickListener(v -> {
+                Branch target = currentBranch != null
+                        ? currentBranch
+                        : (!branches.isEmpty() ? branches.get(0) : null);
 
-            if (target == null || TextUtils.isEmpty(target.site)) return;
+                if (target == null || TextUtils.isEmpty(target.site)) return;
 
-            Uri uri = Uri.parse(target.site);
-            startActivity(new Intent(Intent.ACTION_VIEW, uri));
-        });
+                Uri uri = Uri.parse(target.site);
+                startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            });
+        }
     }
 
     private void setupFabs() {
-        findViewById(R.id.fabMyLocation).setOnClickListener(v -> moveToMyLocation());
-        findViewById(R.id.fabZoomIn).setOnClickListener(v -> zoomBy(+1f));
-        findViewById(R.id.fabZoomOut).setOnClickListener(v -> zoomBy(-1f));
+        View fabMy = findViewById(R.id.fabMyLocation);
+        View fabIn = findViewById(R.id.fabZoomIn);
+        View fabOut = findViewById(R.id.fabZoomOut);
+
+        if (fabMy != null) fabMy.setOnClickListener(v -> moveToMyLocation());
+        if (fabIn != null) fabIn.setOnClickListener(v -> zoomBy(+1f));
+        if (fabOut != null) fabOut.setOnClickListener(v -> zoomBy(-1f));
     }
 
     private void setupMapTapToHideSheet() {
+        if (yandexMap == null || sheetBehavior == null) return;
+
         yandexMap.addInputListener(new InputListener() {
             @Override
             public void onMapTap(@NonNull Map map, @NonNull Point point) {
@@ -214,12 +338,9 @@ public class ConsumersMapActivity extends AppCompatActivity {
         });
     }
 
-    // -------------------- ФИЛИАЛЫ И МЕТКИ --------------------
-
     private void initBranches() {
         branches.clear();
 
-        // Главный офис
         branches.add(new Branch(
                 HQ_TITLE,
                 HQ_ADDR,
@@ -231,7 +352,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
 
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть» г.Минеральные Воды",
-                "тавропольский край, Минеральные Воды, Ставропольская улица, 37, офис 2",
+                "Ставропольский край, Минеральные Воды, Ставропольская улица, 37, офис 2",
                 "+7 (87922) 5-71-86",
                 "https://stavels.ru",
                 null,
@@ -246,6 +367,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(44.699051, 43.000565)
         ));
+
         branches.add(new Branch(
                 "Участок ст.Ессентукская филиала АО «Ставэлектросеть» г.Минеральные Воды",
                 "Ставропольский край, Предгорный муниципальный округ, станица Ессентукская, Западная улица, 47",
@@ -254,6 +376,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(44.019127, 42.842309)
         ));
+
         branches.add(new Branch(
                 "Участок с.Курсавка филиала АО «Ставэлектросеть» г. Минеральные Воды",
                 "Ставропольский край, Андроповский муниципальный округ, село Курсавка, улица Строителей, 34А",
@@ -262,6 +385,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(44.463708, 42.514891)
         ));
+
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть» г.Ипатово",
                 "Ставропольский край, Ипатово, улица Чапаева, 36, офис 2",
@@ -270,6 +394,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.708357, 42.893962)
         ));
+
         branches.add(new Branch(
                 "Участок с.Дивное филиала АО «Ставэлектросеть» г. Ипатово",
                 "Ставропольский край, Апанасенковский муниципальный округ, село Дивное, Шоссейная улица, 17",
@@ -278,6 +403,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.905049, 43.362110)
         ));
+
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть» г.Михайловск",
                 "Почтовая улица, 1А, Михайловск, Шпаковский муниципальный округ, Ставропольский край",
@@ -286,6 +412,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.123974, 42.028427)
         ));
+
         branches.add(new Branch(
                 "Участок с. Кочубеевское филиала АО «Ставэлектросеть»  г.Михайловск",
                 "Ставропольский край, село Кочубеевское, улица Скрипникова, 25,, офис 2",
@@ -294,6 +421,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(44.692868, 41.826907)
         ));
+
         branches.add(new Branch(
                 "Участок с. Грачевка филиала АО «Ставэлектросеть» г. Михайловск",
                 "Ставропольский край, село Грачёвка, Ставропольская улица, 75А, офис 2",
@@ -302,6 +430,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.200016, 42.396700)
         ));
+
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть»  г.Нефтекумск",
                 "Нефтекумск, Рабочая улица, 14 офис 2",
@@ -310,6 +439,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(44.755079, 44.977245)
         ));
+
         branches.add(new Branch(
                 "Участок с. Степное филиала АО «Ставэлектросеть» г. Нефтекумск",
                 "Ставропольский край, село Степное, улица Мира, 90",
@@ -318,6 +448,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(44.266388, 44.595811)
         ));
+
         branches.add(new Branch(
                 "Участок с. Левокумское филиала АО «Ставэлектросеть» г.Нефтекумск",
                 "Ставропольский край, село Левокумское, Шоссейная улица, 16",
@@ -326,6 +457,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(44.833250, 44.654453)
         ));
+
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть» г.Новоалександровск",
                 "Ставропольский край, Новоалександровск, улица Ленина, 13 офис 2",
@@ -334,6 +466,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.481867, 41.213618)
         ));
+
         branches.add(new Branch(
                 "Участок с. Красногвардейское филиала АО «Ставэлектросеть» г.Новоалександровск",
                 "Ставропольский край, село Красногвардейское, улица Лихачёва, 1/2, офис 2",
@@ -342,6 +475,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.832813, 41.499399)
         ));
+
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть» г.Изобильный",
                 "Ставропольский край, Изобильный, улица Крупской, 2А",
@@ -350,6 +484,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.379528, 41.727446)
         ));
+
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть» г.Новопавловск",
                 "Ставропольский край, Кировский муниципальный округ, Новопавловск, улица Правды, 10, офис 2",
@@ -358,6 +493,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(43.972669, 43.621939)
         ));
+
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть» г.Светлоград",
                 "Ставропольский край, Петровский муниципальный округ, Светлоград, Светлая улица, 9А",
@@ -366,6 +502,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.348435, 42.851409)
         ));
+
         branches.add(new Branch(
                 "Участок г.Благодарный филиала АО «Ставэлектросеть» г.Светлоград",
                 "Благодарный, Советская улица, 232",
@@ -374,6 +511,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.096922, 43.421641)
         ));
+
         branches.add(new Branch(
                 "Участок с. Летняя Ставка филиала АО «Ставэлектросеть» г.Светлоград",
                 "Ставропольский край, Туркменский муниципальный округ, село Летняя Ставка, Почтовый переулок, 4А",
@@ -382,6 +520,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(45.430265, 43.440524)
         ));
+
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть» г.Зеленокумск",
                 "Ставропольский край, Советский муниципальный округ, Зеленокумск, Короткий переулок, 20, офис 2",
@@ -390,6 +529,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(44.418464, 43.891047)
         ));
+
         branches.add(new Branch(
                 "Участок ст. Курская филиала АО «Ставэлектросеть» г. Зеленокумск",
                 "Ставропольский край, станица Курская, Кольцевая улица, 42",
@@ -398,6 +538,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null,
                 new Point(44.034138, 44.463031)
         ));
+
         branches.add(new Branch(
                 "Филиал АО «Ставэлектросеть» г. Будённовск",
                 "Ставропольский край, Будённовск, улица Полющенко, 141",
@@ -409,6 +550,8 @@ public class ConsumersMapActivity extends AppCompatActivity {
     }
 
     private void addBranchMarkers() {
+        if (mapObjects == null) return;
+
         ImageProvider icon = vectorToImageProvider(R.drawable.ic_pin_purple, dp(36));
 
         for (Branch branch : branches) {
@@ -429,8 +572,11 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 Object data = mapObject.getUserData();
                 if (data instanceof Branch) {
                     Branch branch = (Branch) data;
-                    Log.d(TAG, "Marker tapped: " + branch.title + " at "
-                            + point.getLatitude() + "," + point.getLongitude());
+
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "Marker tapped: " + branch.title);
+                    }
+
                     showSheetForBranch(branch);
                     return true;
                 }
@@ -440,26 +586,33 @@ public class ConsumersMapActivity extends AppCompatActivity {
         return branchTapListener;
     }
 
-    /** Показываем карточку для конкретного филиала. */
     private void showSheetForBranch(@NonNull Branch branch) {
         currentBranch = branch;
 
-        sheetTitle.setText(branch.title);
-        sheetAddress.setText(branch.address);
+        if (sheetTitle != null) sheetTitle.setText(branch.title);
+        if (sheetAddress != null) sheetAddress.setText(branch.address);
 
-        if (TextUtils.isEmpty(branch.description)) {
-            sheetDesc.setVisibility(View.GONE);
-        } else {
-            sheetDesc.setText(branch.description);
-            sheetDesc.setVisibility(View.VISIBLE);
+        if (sheetDesc != null) {
+            if (TextUtils.isEmpty(branch.description)) {
+                sheetDesc.setVisibility(View.GONE);
+            } else {
+                sheetDesc.setText(branch.description);
+                sheetDesc.setVisibility(View.VISIBLE);
+            }
         }
 
-        sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        // Сначала освобождаем место снизу и уводим nav,
+        // потом открываем sheet
+        updateBranchSheetBottomMargin(false);
+        setBottomNavVisible(false, true);
+
+        if (sheetBehavior != null) {
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
     }
 
-    /** Двигаем камеру так, чтобы были видны все филиалы (весь край). */
     private void moveCameraToAllBranches() {
-        if (branches.isEmpty()) return;
+        if (branches.isEmpty() || yandexMap == null) return;
 
         double minLat = 90.0, maxLat = -90.0;
         double minLon = 180.0, maxLon = -180.0;
@@ -475,7 +628,6 @@ public class ConsumersMapActivity extends AppCompatActivity {
         }
 
         if (minLat == maxLat && minLon == maxLon) {
-            // один филиал — просто слегка приблизим к нему
             yandexMap.move(
                     new CameraPosition(branches.get(0).point, 12f, 0f, 0f),
                     new Animation(Animation.Type.SMOOTH, 0.6f),
@@ -489,7 +641,6 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 new Point(maxLat, maxLon)
         );
 
-        // ВАЖНО: передаём Geometry, а не BoundingBox напрямую
         CameraPosition pos = yandexMap.cameraPosition(Geometry.fromBoundingBox(bbox));
         yandexMap.move(
                 pos,
@@ -497,8 +648,6 @@ public class ConsumersMapActivity extends AppCompatActivity {
                 null
         );
     }
-
-    // -------------------- ГЕОЛОКАЦИЯ --------------------
 
     private void initLocationPermissionLauncher() {
         locationPermLauncher =
@@ -538,6 +687,8 @@ public class ConsumersMapActivity extends AppCompatActivity {
     }
 
     private void enableUserLocationLayer() {
+        if (mapView == null) return;
+
         if (userLocationLayer == null) {
             userLocationLayer = MapKitFactory.getInstance()
                     .createUserLocationLayer(mapView.getMapWindow());
@@ -553,6 +704,8 @@ public class ConsumersMapActivity extends AppCompatActivity {
             return;
         }
 
+        if (fused == null) return;
+
         fused.getLastLocation().addOnSuccessListener(loc -> {
             if (loc != null) {
                 updateMyLocation(loc);
@@ -563,7 +716,9 @@ public class ConsumersMapActivity extends AppCompatActivity {
         });
     }
 
-    private void updateMyLocation(@NonNull Location loc) {
+    private void updateMyLocation(@Nullable Location loc) {
+        if (loc == null || yandexMap == null) return;
+
         myPoint = new Point(loc.getLatitude(), loc.getLongitude());
         yandexMap.move(
                 new CameraPosition(myPoint, 15f, 0f, 0f),
@@ -572,26 +727,13 @@ public class ConsumersMapActivity extends AppCompatActivity {
         );
     }
 
-    // -------------------- ВНЕШНЯЯ НАВИГАЦИЯ --------------------
-
-    /** Открыть маршрут до выбранного филиала во внешнем приложении/браузере. */
     private void openExternalRoute(@NonNull Branch branch) {
         double lat = branch.point.getLatitude();
         double lon = branch.point.getLongitude();
 
-        // 1. Яндекс.Карты
-        if (tryOpenUri(Uri.parse("yandexmaps://build_route_on_map?lat_to="
-                + lat + "&lon_to=" + lon))) {
-            return;
-        }
+        if (tryOpenUri(Uri.parse("yandexmaps://build_route_on_map?lat_to=" + lat + "&lon_to=" + lon))) return;
+        if (tryOpenUri(Uri.parse("yandexnavi://build_route_on_map?lat_to=" + lat + "&lon_to=" + lon))) return;
 
-        // 2. Яндекс.Навигатор
-        if (tryOpenUri(Uri.parse("yandexnavi://build_route_on_map?lat_to="
-                + lat + "&lon_to=" + lon))) {
-            return;
-        }
-
-        // 3. Google Maps (если установлены)
         Uri gmmUri = Uri.parse("google.navigation:q=" + lat + "," + lon + "&mode=d");
         Intent gmmIntent = new Intent(Intent.ACTION_VIEW, gmmUri);
         gmmIntent.setPackage("com.google.android.apps.maps");
@@ -600,9 +742,7 @@ public class ConsumersMapActivity extends AppCompatActivity {
             return;
         }
 
-        // 4. Браузер — веб-версия Google Maps
-        Uri webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query="
-                + lat + "," + lon);
+        Uri webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=" + lat + "," + lon);
         startActivity(new Intent(Intent.ACTION_VIEW, webUri));
     }
 
@@ -615,9 +755,98 @@ public class ConsumersMapActivity extends AppCompatActivity {
         return false;
     }
 
-    // -------------------- УТИЛИТЫ --------------------
+    private void updateBranchSheetBottomMargin(boolean reserveSpaceForBottomNav) {
+        if (branchSheet == null) return;
 
+        ViewGroup.LayoutParams rawLp = branchSheet.getLayoutParams();
+        if (!(rawLp instanceof ViewGroup.MarginLayoutParams)) return;
+
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) rawLp;
+
+        int targetMargin;
+        if (reserveSpaceForBottomNav) {
+            targetMargin =
+                    getResources().getDimensionPixelSize(R.dimen.bottom_nav_height)
+                            + getResources().getDimensionPixelSize(R.dimen.bottom_nav_bottom_margin)
+                            + getResources().getDimensionPixelSize(R.dimen.space_12);
+        } else {
+            targetMargin = getResources().getDimensionPixelSize(R.dimen.space_12);
+        }
+
+        if (lp.bottomMargin != targetMargin) {
+            lp.bottomMargin = targetMargin;
+            branchSheet.setLayoutParams(lp);
+        }
+    }
+
+    private void setBottomNavVisible(boolean visible, boolean animate) {
+        if (bottomNav == null) return;
+
+        bottomNav.animate().cancel();
+
+        int hiddenTranslation =
+                getResources().getDimensionPixelSize(R.dimen.bottom_nav_height)
+                        + getResources().getDimensionPixelSize(R.dimen.bottom_nav_bottom_margin)
+                        + getResources().getDimensionPixelSize(R.dimen.space_12);
+
+        bottomNavVisible = visible;
+
+        if (visible) {
+            if (bottomNav.getVisibility() != View.VISIBLE) {
+                bottomNav.setVisibility(View.VISIBLE);
+            }
+
+            bottomNav.setClickable(true);
+            bottomNav.setEnabled(true);
+
+            if (animate) {
+                bottomNav.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .setDuration(180L)
+                        .start();
+            } else {
+                bottomNav.setAlpha(1f);
+                bottomNav.setTranslationY(0f);
+            }
+            return;
+        }
+
+        bottomNav.setClickable(false);
+        bottomNav.setEnabled(false);
+
+        if (animate) {
+            bottomNav.animate()
+                    .alpha(0f)
+                    .translationY(hiddenTranslation)
+                    .setDuration(160L)
+                    .withEndAction(() -> {
+                        if (!bottomNavVisible && bottomNav != null) {
+                            bottomNav.setVisibility(View.INVISIBLE);
+                        }
+                    })
+                    .start();
+        } else {
+            bottomNav.setAlpha(0f);
+            bottomNav.setTranslationY(hiddenTranslation);
+            bottomNav.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (sheetBehavior != null
+                && sheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
+            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            return;
+        }
+        super.onBackPressed();
+    }
+    private BottomNavigationView bottomNav;
+    private boolean bottomNavVisible = true;
     private void zoomBy(float delta) {
+        if (yandexMap == null) return;
+
         CameraPosition cp = yandexMap.getCameraPosition();
         float zoom = Math.max(3f, Math.min(19f, cp.getZoom() + delta));
         yandexMap.move(
@@ -643,12 +872,17 @@ public class ConsumersMapActivity extends AppCompatActivity {
             dr.draw(c);
             return ImageProvider.fromBitmap(bmp);
         } catch (Exception e) {
-            Log.w(TAG, "vectorToImageProvider failed", e);
+            if (BuildConfig.DEBUG) {
+                Log.w(TAG, "vectorToImageProvider failed: " + e.getMessage());
+            }
             return null;
         }
     }
 
-    // -------------------- МОДЕЛЬ ФИЛИАЛА --------------------
+    private void toast(@NonNull String msg) {
+        if (isFinishing() || isDestroyed()) return;
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
 
     private static class Branch {
         final String title;

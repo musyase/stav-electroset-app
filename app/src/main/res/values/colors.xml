@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- БАЗОВЫЕ -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="outline">#22000000</color>
+
+    <!-- FOUNDATION / APP -->
+    <color name="app_bg">#FFF4F7FB</color>
+    <color name="app_surface">#FFFFFFFF</color>
+    <color name="app_surface_variant">#FFF0F4F8</color>
+
+    <color name="app_card">#FFFFFFFF</color>
+    <color name="app_card_pressed">#FFF3F6FB</color>
+
+    <!-- BRAND / PRIMARY -->
+    <color name="app_primary">#FF2F6FE4</color>
+    <color name="app_on_primary">#FFFFFFFF</color>
+    <color name="app_primary_container">#FFDCE8FF</color>
+    <color name="app_on_primary_container">#FF0F2A63</color>
+
+    <!-- SECONDARY -->
+    <color name="app_secondary">#FF3A6B8F</color>
+    <color name="app_on_secondary">#FFFFFFFF</color>
+    <color name="app_secondary_container">#FFDDECF8</color>
+    <color name="app_on_secondary_container">#FF12344C</color>
+
+    <!-- TEXT -->
+    <color name="app_text_primary">#FF18212B</color>
+    <color name="app_text_secondary">#FF5F6B7A</color>
+    <color name="app_text_tertiary">#FF8D98A6</color>
+
+    <!-- STROKE / DIVIDER -->
+    <color name="app_outline">#FFD7DEE8</color>
+    <color name="app_divider">#FFE7ECF3</color>
+
+    <!-- STATUS -->
+    <color name="app_success">#FF1F9D61</color>
+    <color name="app_warning">#FFC78412</color>
+    <color name="app_error">#FFD13B3B</color>
+    <color name="app_on_error">#FFFFFFFF</color>
+    <color name="app_info">#FF2F6FE4</color>
+
+    <!-- SERVICE -->
+    <color name="app_scrim">#660F172A</color>
+    <color name="app_ripple">#142F6FE4</color>
+
+    <!-- COMPAT / LEGACY -->
+    <color name="outline">#FFD7DEE8</color>
+
 </resources>

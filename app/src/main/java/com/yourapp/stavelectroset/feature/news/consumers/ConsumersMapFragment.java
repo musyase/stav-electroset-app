@@ -94,13 +94,51 @@ public class ConsumersMapFragment extends Fragment {
     ));
 
     private Branch selectedBranch;
+    // ===== Permissions + UserLocationLayer =====
+
+    @Nullable
+    private UserLocationLayer userLocationLayer;
 
     private final ActivityResultLauncher<String[]> locPermsLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                boolean granted = false;
-                for (Boolean v : result.values()) granted |= (v != null && v);
-                if (granted) enableUserLocationLayer();
+                boolean fine = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_FINE_LOCATION));
+                boolean coarse = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_COARSE_LOCATION));
+
+                if (fine || coarse) {
+                    enableUserLocationLayer();
+                } else {
+                    if (getView() != null) {
+                        Snackbar.make(getView(), "Геолокация не разрешена — работаем без неё", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
             });
+
+    private void requestLocationPermissionsIfNeeded() {
+        boolean fine = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+        boolean coarse = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+
+        if (fine || coarse) {
+            enableUserLocationLayer();
+        } else {
+            locPermsLauncher.launch(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            });
+        }
+    }
+
+    private void enableUserLocationLayer() {
+        if (!isAdded() || mapView == null) return;
+
+        if (userLocationLayer == null) {
+            userLocationLayer = MapKitFactory.getInstance().createUserLocationLayer(mapView.getMapWindow());
+            // В MapKit это называется setHeadingModeActive, а не setHeadingEnabled :contentReference[oaicite:1]{index=1}
+            userLocationLayer.setHeadingModeActive(true);
+        }
+        userLocationLayer.setVisible(true);
+    }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle s) {
@@ -296,20 +334,20 @@ public class ConsumersMapFragment extends Fragment {
     }
 
     // ---- Разрешения и «моё местоположение»
-    private void requestLocationPermissionsIfNeeded() {
-        boolean fine   = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)   == PackageManager.PERMISSION_GRANTED;
-        boolean coarse = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        if (!fine && !coarse) {
-            locPermsLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
-        } else {
-            enableUserLocationLayer();
-        }
-    }
-
-    private void enableUserLocationLayer() {
-        UserLocationLayer layer = MapKitFactory.getInstance().createUserLocationLayer(mapView.getMapWindow());
-        layer.setVisible(true);
-    }
+//    private void requestLocationPermissionsIfNeeded() {
+//        boolean fine   = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)   == PackageManager.PERMISSION_GRANTED;
+//        boolean coarse = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+//        if (!fine && !coarse) {
+//            locPermsLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
+//        } else {
+//            enableUserLocationLayer();
+//        }
+//    }
+//
+//    private void enableUserLocationLayer() {
+//        UserLocationLayer layer = MapKitFactory.getInstance().createUserLocationLayer(mapView.getMapWindow());
+//        layer.setVisible(true);
+//    }
 
     private void moveToMyLocation() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED

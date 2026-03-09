@@ -3,22 +3,37 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/app_bg">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:title="Личный кабинет"
-        app:titleCentered="true"
-        app:navigationIconTint="?attr/colorOnPrimary"/>
+        android:layout_height="wrap_content"
+        android:background="@color/app_surface"
+        android:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            style="@style/Widget.App.Toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:title="Личный кабинет"
+            app:titleCentered="true"
+            app:itemIconTint="@color/app_text_primary"
+            app:navigationIconTint="@color/app_text_primary" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/profileScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         android:clipToPadding="false"
-        android:paddingBottom="@dimen/bnv_height"
+        android:fillViewport="true"
+        android:paddingStart="@dimen/screen_padding_horizontal"
+        android:paddingTop="@dimen/space_12"
+        android:paddingEnd="@dimen/screen_padding_horizontal"
+        android:paddingBottom="112dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -26,158 +41,312 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Карточка с аватаром и основными данными -->
+            <!-- HERO CARD -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.App.Card"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"
-                app:cardUseCompatPadding="true"
-                app:cardElevation="6dp"
-                app:strokeColor="?attr/colorOutline"
-                app:strokeWidth="1dp">
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center_horizontal"
-                    android:padding="16dp">
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_20">
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivAvatar"
                         android:layout_width="96dp"
                         android:layout_height="96dp"
-                        android:layout_marginBottom="12dp"
-                        android:src="@mipmap/ic_launcher"
-                        android:scaleType="centerCrop"
+                        android:layout_marginBottom="@dimen/space_12"
                         android:contentDescription="@null"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"/>
+                        android:scaleType="centerCrop"
+                        android:src="@mipmap/ic_launcher"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                        app:strokeColor="@color/app_outline"
+                        app:strokeWidth="@dimen/stroke_thin" />
 
-                    <!-- ФИО крупно -->
                     <TextView
                         android:id="@+id/tvFullName"
+                        style="@style/TextAppearance.App.TitleMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ФИО:"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:layout_marginBottom="4dp"/>
+                        android:gravity="center"
+                        android:text="ФИО:" />
 
-                    <!-- Почта -->
                     <TextView
                         android:id="@+id/tvEmail"
+                        style="@style/TextAppearance.App.BodySecondary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Почта:"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="4dp"/>
+                        android:layout_marginTop="@dimen/space_8"
+                        android:gravity="center"
+                        android:text="Почта:" />
 
-                    <!-- Логин -->
                     <TextView
                         android:id="@+id/tvLogin"
+                        style="@style/TextAppearance.App.BodySecondary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Логин:"
-                        android:textSize="14sp"/>
+                        android:layout_marginTop="@dimen/space_4"
+                        android:gravity="center"
+                        android:text="Логин:" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Карточка с подробными данными -->
+            <!-- ДЕТАЛИ ПРОФИЛЯ -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.App.Card.Section"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardUseCompatPadding="true"
-                app:cardElevation="4dp"
-                app:strokeColor="?attr/colorOutline"
-                app:strokeWidth="1dp">
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/space_20">
+
+                    <TextView
+                        style="@style/TextAppearance.App.TitleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Данные профиля" />
 
                     <TextView
                         android:id="@+id/tvAccountNumber"
+                        style="@style/TextAppearance.App.BodyLarge"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Лицевой счёт:"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="4dp"/>
+                        android:layout_marginTop="@dimen/space_16"
+                        android:text="Лицевой счёт:" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:layout_marginBottom="@dimen/space_12"
+                        android:background="@color/app_divider" />
 
                     <TextView
                         android:id="@+id/tvPhone"
+                        style="@style/TextAppearance.App.BodyLarge"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Телефон:"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="4dp"/>
+                        android:text="Телефон:" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:layout_marginBottom="@dimen/space_12"
+                        android:background="@color/app_divider" />
 
                     <TextView
                         android:id="@+id/tvMeterSerials"
+                        style="@style/TextAppearance.App.BodyLarge"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Приборы учёта:"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="4dp"/>
+                        android:text="Приборы учёта:" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:layout_marginBottom="@dimen/space_12"
+                        android:background="@color/app_divider" />
 
                     <TextView
                         android:id="@+id/tvSubscriberType"
+                        style="@style/TextAppearance.App.BodyLarge"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Тип абонента:"
-                        android:textSize="16sp"/>
+                        android:text="Тип абонента:" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Кнопки -->
-            <!-- Кнопки -->
+            <!-- ACTIONS -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAdmin"
+                style="@style/Widget.App.Button.Tonal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_16"
+                android:text="Админ-панель"
+                android:visibility="gone" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="start"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="@dimen/space_12"
+                android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAdmin"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:text="Админ-панель"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:id="@+id/btnRequest"
+                    style="@style/Widget.App.Button.Primary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Заявка" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRequestCertificate"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:text="Заказать справку"
-                    android:layout_marginStart="12dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:id="@+id/btnComplaint"
+                    style="@style/Widget.App.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_12"
+                    android:layout_weight="1"
+                    android:text="Жалоба" />
+
             </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogout"
-                android:text="Выйти"
-                android:layout_marginTop="12dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+            <!-- МОИ ЗАЯВКИ -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMyRequests"
+                style="@style/Widget.App.Card.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_20">
+
+                    <TextView
+                        android:id="@+id/tvMyRequestsTitle"
+                        style="@style/TextAppearance.App.TitleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Мои заявки" />
+
+                    <TextView
+                        android:id="@+id/tvMyRequestsEmpty"
+                        style="@style/TextAppearance.App.BodySecondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_10"
+                        android:text="Пока что заявок нет."
+                        android:visibility="gone" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvMyRequests"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:nestedScrollingEnabled="false" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- МОИ ЖАЛОБЫ -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMyComplaints"
+                style="@style/Widget.App.Card.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_20">
+
+                    <TextView
+                        android:id="@+id/tvMyComplaintsTitle"
+                        style="@style/TextAppearance.App.TitleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Мои жалобы" />
+
+                    <TextView
+                        android:id="@+id/tvMyComplaintsEmpty"
+                        style="@style/TextAppearance.App.BodySecondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_10"
+                        android:text="Пока что жалоб нет."
+                        android:visibility="gone" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvMyComplaints"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:nestedScrollingEnabled="false" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ИНФОРМАЦИОННЫЕ ПИСЬМА -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardInfoLetters"
+                style="@style/Widget.App.Card.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_20">
+
+                    <TextView
+                        android:id="@+id/tvInfoLettersTitle"
+                        style="@style/TextAppearance.App.TitleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Информационные письма" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOpenInfoLetters"
+                        style="@style/Widget.App.Button.Outlined"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:text="Открыть все письма" />
+
+                    <TextView
+                        android:id="@+id/tvInfoLettersEmpty"
+                        style="@style/TextAppearance.App.BodySecondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:text="Пока что писем вам не приходило."
+                        android:visibility="gone" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvInfoLetters"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:nestedScrollingEnabled="false" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnLogout"
+                        style="@style/Widget.App.Button.DangerOutlined"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_16"
+                        android:text="Выйти" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
+        style="@style/Widget.App.BottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/bottom_nav_height"
         android:layout_gravity="bottom"
-        app:labelVisibilityMode="labeled"
-        app:itemIconTint="@color/bnv_icon_tint"
-        app:itemTextColor="@color/bnv_icon_tint"
-        app:menu="@menu/menu_bottom_nav"/>
+        android:layout_marginStart="@dimen/bottom_nav_horizontal_margin"
+        android:layout_marginEnd="@dimen/bottom_nav_horizontal_margin"
+        android:layout_marginBottom="@dimen/bottom_nav_bottom_margin"
+        android:elevation="8dp"
+        app:menu="@menu/menu_bottom_nav" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

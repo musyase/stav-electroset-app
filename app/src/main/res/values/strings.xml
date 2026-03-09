@@ -37,4 +37,9 @@
     <string name="share">Поделиться</string>
     <string name="news_source_fmt">Источник: %1$s</string>
     <string name="content_image">Изображение новости</string>
+    <string name="admin_panel_title">Админ-панель</string>
+    <string name="news_title">Новости</string>
+    <string name="empty_state_no_data">Нет данных</string>
+    <string name="empty_state_retry">Повторите попытку</string>
+
 </resources>

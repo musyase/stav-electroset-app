@@ -1,4 +1,22 @@
-plugins { id 'com.android.application' }
+plugins {
+    id 'com.android.application'
+}
+
+import java.util.Properties
+
+// ---------- local.properties (SUPABASE_URL / SUPABASE_ANON_KEY) ----------
+def localProps = new Properties()
+def localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { stream -> localProps.load(stream) }
+}
+
+def supabaseUrl = (localProps.getProperty("SUPABASE_URL") ?: "").trim()
+def supabaseAnonKey = (localProps.getProperty("SUPABASE_ANON_KEY") ?: "").trim()
+
+if (!supabaseUrl || !supabaseAnonKey) {
+    throw new GradleException("SUPABASE_URL / SUPABASE_ANON_KEY не заданы в local.properties")
+}
 
 android {
     namespace 'com.yourapp.stavelectroset'
@@ -9,7 +27,13 @@ android {
         minSdk 26
         targetSdk 35
         versionCode 1
-        versionName '1.0.0'
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Доступно в коде как BuildConfig.SUPABASE_URL / BuildConfig.SUPABASE_ANON_KEY
+        buildConfigField "String", "SUPABASE_URL", "\"${supabaseUrl}\""
+        buildConfigField "String", "SUPABASE_ANON_KEY", "\"${supabaseAnonKey}\""
     }
 
     compileOptions {
@@ -18,45 +42,63 @@ android {
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+        }
         release {
             minifyEnabled true
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
-    // переменные окружения (потом можно сделать productFlavors)
-    buildFeatures { buildConfig true }
+    buildFeatures {
+        buildConfig true
+        viewBinding true
+    }
 }
 
 dependencies {
+    // UI
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.13.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'androidx.webkit:webkit:1.14.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
 
-    // Lifecycle (LiveData)
-    implementation 'androidx.lifecycle:lifecycle-livedata:2.9.4'
+    // Lifecycle
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.10.0'
+
+    // Security (для токенов)
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
 
     // Room
-    implementation 'androidx.room:room-runtime:2.8.3'
-    annotationProcessor 'androidx.room:room-compiler:2.8.3'
+    def roomVersion = "2.8.4"
+    implementation "androidx.room:room-runtime:$roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$roomVersion"
 
-    // Сеть + парсинг
-    implementation 'com.squareup.okhttp3:okhttp:5.3.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:5.3.0'   // <— ВАЖНО
-    implementation 'com.squareup.retrofit2:retrofit:3.0.0'
-    implementation 'com.squareup.retrofit2:converter-gson:3.0.0'
+    // Network
+    implementation platform('com.squareup.okhttp3:okhttp-bom:5.3.2')
+    implementation 'com.squareup.okhttp3:okhttp'
+    implementation 'com.squareup.okhttp3:logging-interceptor'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+
     implementation 'org.jsoup:jsoup:1.17.2'
 
-    // Картинки
+    // Images
     implementation "com.github.bumptech.glide:glide:4.16.0"
     annotationProcessor "com.github.bumptech.glide:compiler:4.16.0"
-    implementation 'com.google.android.material:material:1.13.0'
 
-    // Карты и гео
+    // Maps & geo
     implementation "com.yandex.android:maps.mobile:4.25.0-full"
-    implementation "com.google.android.material:material:1.13.0"
     implementation "com.google.android.gms:play-services-location:21.3.0"
+
+    // Parsing docs
+    implementation "org.apache.poi:poi-ooxml:5.2.5"
 }

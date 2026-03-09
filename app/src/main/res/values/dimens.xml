@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- ========================================================= -->
+    <!-- LEGACY / COMPAT                                            -->
+    <!-- Оставляем старые имена, чтобы не сломать существующие XML -->
+    <!-- ========================================================= -->
+
     <!-- запас под BottomNavigation + жестовую панель -->
     <dimen name="register_bottom_inset">128dp</dimen>
+
     <dimen name="screen_padding">16dp</dimen>
     <dimen name="card_padding">20dp</dimen>
     <dimen name="field_spacing">12dp</dimen>
@@ -9,4 +16,139 @@
     <dimen name="btn_radius">28dp</dimen>
     <dimen name="auth_max_width">420dp</dimen>
     <dimen name="bnv_height">80dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- FOUNDATION SPACING TOKENS                                 -->
+    <!-- ========================================================= -->
+
+    <dimen name="space_2">2dp</dimen>
+    <dimen name="space_4">4dp</dimen>
+    <dimen name="space_6">6dp</dimen>
+    <dimen name="space_8">8dp</dimen>
+    <dimen name="space_10">10dp</dimen>
+    <dimen name="space_12">12dp</dimen>
+    <dimen name="space_14">14dp</dimen>
+    <dimen name="space_16">16dp</dimen>
+    <dimen name="space_18">18dp</dimen>
+    <dimen name="space_20">20dp</dimen>
+    <dimen name="space_24">24dp</dimen>
+    <dimen name="space_28">28dp</dimen>
+    <dimen name="space_32">32dp</dimen>
+    <dimen name="space_40">40dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- SCREEN LAYOUT                                              -->
+    <!-- ========================================================= -->
+
+    <dimen name="screen_padding_horizontal">16dp</dimen>
+    <dimen name="screen_padding_vertical">16dp</dimen>
+    <dimen name="screen_padding_large">20dp</dimen>
+
+    <dimen name="section_gap_small">12dp</dimen>
+    <dimen name="section_gap">20dp</dimen>
+    <dimen name="section_gap_large">24dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- SHAPES / RADIUS                                            -->
+    <!-- ========================================================= -->
+
+    <dimen name="radius_xs">8dp</dimen>
+    <dimen name="radius_sm">12dp</dimen>
+    <dimen name="radius_md">16dp</dimen>
+    <dimen name="radius_lg">20dp</dimen>
+    <dimen name="radius_xl">24dp</dimen>
+    <dimen name="radius_button">16dp</dimen>
+    <dimen name="radius_card">20dp</dimen>
+    <dimen name="radius_sheet">24dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- STROKE / ELEVATION                                         -->
+    <!-- ========================================================= -->
+
+    <dimen name="stroke_thin">1dp</dimen>
+    <dimen name="stroke_medium">1.5dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- TOOLBAR / APP BAR                                          -->
+    <!-- ========================================================= -->
+
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="toolbar_horizontal_padding">16dp</dimen>
+    <dimen name="toolbar_title_margin_start">8dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- BUTTONS                                                    -->
+    <!-- ========================================================= -->
+
+    <dimen name="button_height">52dp</dimen>
+    <dimen name="button_height_small">44dp</dimen>
+    <dimen name="button_padding_horizontal">18dp</dimen>
+    <dimen name="button_padding_vertical">12dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- INPUTS                                                     -->
+    <!-- ========================================================= -->
+
+    <dimen name="input_min_height">56dp</dimen>
+    <dimen name="input_content_padding_horizontal">16dp</dimen>
+    <dimen name="input_content_padding_vertical">14dp</dimen>
+    <dimen name="input_spacing_vertical">12dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- CARDS / LIST ITEMS                                         -->
+    <!-- ========================================================= -->
+
+    <dimen name="card_radius">20dp</dimen>
+    <dimen name="card_padding_horizontal">16dp</dimen>
+    <dimen name="card_padding_vertical">16dp</dimen>
+    <dimen name="card_gap">12dp</dimen>
+
+    <dimen name="list_item_min_height">72dp</dimen>
+    <dimen name="list_item_padding_horizontal">16dp</dimen>
+    <dimen name="list_item_padding_vertical">12dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- NEWS / MAIN SCREEN                                         -->
+    <!-- ========================================================= -->
+
+    <dimen name="news_card_image_size">88dp</dimen>
+    <dimen name="news_card_content_gap">12dp</dimen>
+    <dimen name="news_card_date_margin_top">8dp</dimen>
+    <dimen name="news_list_bottom_spacing">12dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- BOTTOM NAVIGATION                                          -->
+    <!-- ========================================================= -->
+
+    <dimen name="bottom_nav_height">72dp</dimen>
+    <dimen name="bottom_nav_icon_size">24dp</dimen>
+    <dimen name="bottom_nav_horizontal_margin">12dp</dimen>
+    <dimen name="bottom_nav_bottom_margin">8dp</dimen>
+    <dimen name="bottom_nav_corner_radius">22dp</dimen>
+    <dimen name="bottom_nav_item_padding_top">8dp</dimen>
+    <dimen name="bottom_nav_item_padding_bottom">10dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- DIALOG / BOTTOM SHEET                                      -->
+    <!-- ========================================================= -->
+
+    <dimen name="dialog_corner_radius">24dp</dimen>
+    <dimen name="dialog_padding">20dp</dimen>
+    <dimen name="bottom_sheet_corner_radius">24dp</dimen>
+    <dimen name="bottom_sheet_padding">20dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- STATES / PLACEHOLDERS                                      -->
+    <!-- ========================================================= -->
+
+    <dimen name="state_icon_size">56dp</dimen>
+    <dimen name="state_content_max_width">280dp</dimen>
+
+    <!-- ========================================================= -->
+    <!-- AUTH / HERO                                                 -->
+    <!-- ========================================================= -->
+
+    <dimen name="auth_card_radius">28dp</dimen>
+    <dimen name="auth_card_padding">24dp</dimen>
+
 </resources>

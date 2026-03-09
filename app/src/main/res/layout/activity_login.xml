@@ -2,128 +2,177 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/app_bg"
+    android:fitsSystemWindows="true">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
         android:clipToPadding="false"
-        android:paddingBottom="@dimen/bnv_height">
+        android:fillViewport="true"
+        android:paddingBottom="112dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="640dp"
             android:padding="@dimen/screen_padding">
+
+            <LinearLayout
+                android:id="@+id/loginHero"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/space_24"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/stavelectroset_ic" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_16"
+                    android:text="@string/app_name"
+                    android:textColor="@color/app_text_primary"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:gravity="center"
+                    android:text="Корпоративный сервис для новостей,\nзаявок, жалоб и филиалов"
+                    android:textColor="@color/app_text_secondary"
+                    android:textSize="14sp"
+                    android:textAlignment="center" />
+            </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardLogin"
+                style="@style/Widget.App.AuthCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintWidth_percent="0.92"
-                app:layout_constraintWidth_default="percent"
-                app:layout_constraintWidth_max="@dimen/auth_max_width"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="@dimen/space_24"
+                app:layout_constraintTop_toBottomOf="@id/loginHero"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:cardUseCompatPadding="true"
-                app:cardElevation="6dp"
-                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.AuthCard"
-                app:strokeColor="?attr/colorOutline"
-                app:strokeWidth="1dp">
+                app:layout_constraintWidth_percent="0.92"
+                app:layout_constraintWidth_default="percent"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <LinearLayout
-                    android:orientation="vertical"
-                    android:padding="@dimen/card_padding"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/auth_card_padding">
 
                     <TextView
                         android:id="@+id/tvTitle"
-                        android:text="Вход"
-                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                        android:textStyle="bold"
+                        style="@style/TextAppearance.App.TitleLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginBottom="@dimen/section_spacing"/>
+                        android:text="Вход в аккаунт" />
+
+                    <TextView
+                        style="@style/TextAppearance.App.Subtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_8"
+                        android:text="Используйте логин или e-mail, чтобы открыть доступ к профилю, обращениям и письмам." />
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilLogin"
+                        style="@style/Widget.App.TextInputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Логин или почта"
-                        app:boxBackgroundMode="outline"
-                        app:boxStrokeColor="?attr/colorPrimary">
+                        android:layout_marginTop="@dimen/space_20"
+                        android:hint="Логин или e-mail">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etLogin"
+                            style="@style/Widget.App.TextInputEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="textEmailAddress|textNoSuggestions"
-                            android:autofillHints="username,emailAddress"/>
+                            android:autofillHints="username,emailAddress"
+                            android:inputType="textNoSuggestions"
+                            android:maxLines="1" />
                     </com.google.android.material.textfield.TextInputLayout>
-
-                    <Space
-                        android:layout_width="1dp"
-                        android:layout_height="@dimen/field_spacing"/>
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilPassword"
+                        style="@style/Widget.App.TextInputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_12"
                         android:hint="Пароль"
-                        app:endIconMode="password_toggle"
-                        app:boxBackgroundMode="outline"
-                        app:boxStrokeColor="?attr/colorPrimary">
+                        app:endIconMode="password_toggle">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etPassword"
+                            style="@style/Widget.App.TextInputEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:autofillHints="password"
                             android:inputType="textPassword"
-                            android:autofillHints="password"/>
+                            android:maxLines="1" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <Space
-                        android:layout_width="1dp"
-                        android:layout_height="@dimen/section_spacing"/>
+                    <TextView
+                        android:id="@+id/tvForgotPassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="@dimen/space_10"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        android:padding="6dp"
+                        android:text="Забыли пароль?"
+                        android:textColor="@color/app_primary"
+                        android:textStyle="bold" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnLogin"
+                        style="@style/Widget.App.Button.Primary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Вход"
-                        app:cornerRadius="@dimen/btn_radius"
-                        style="?attr/materialButtonStyle"/>
-
-                    <Space
-                        android:layout_width="1dp"
-                        android:layout_height="@dimen/field_spacing"/>
+                        android:layout_marginTop="@dimen/space_20"
+                        android:text="Войти" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnGoRegister"
+                        style="@style/Widget.App.Button.Outlined"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Нет аккаунта? Зарегистрироваться"
-                        style="?attr/materialButtonOutlinedStyle"
-                        app:cornerRadius="@dimen/btn_radius"/>
+                        android:layout_marginTop="@dimen/space_12"
+                        android:text="Нет аккаунта? Зарегистрироваться" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-    <!-- Низ: BottomNavigationView -->
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
+        style="@style/Widget.App.BottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/bottom_nav_height"
         android:layout_gravity="bottom"
-        app:labelVisibilityMode="labeled"
-        app:itemIconTint="@color/bnv_icon_tint"
-        app:itemTextColor="@color/bnv_icon_tint"
-        app:menu="@menu/menu_bottom_nav"/>
+        android:layout_marginStart="@dimen/bottom_nav_horizontal_margin"
+        android:layout_marginEnd="@dimen/bottom_nav_horizontal_margin"
+        android:layout_marginBottom="@dimen/bottom_nav_bottom_margin"
+        android:elevation="8dp"
+        app:menu="@menu/menu_bottom_nav" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
