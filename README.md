@@ -9,6 +9,7 @@ This Java prototype reads news from the [Stavropol Electric Networks website](ht
 - Local Room storage observed by the UI through `LiveData`.
 - Pull to refresh with `SwipeRefreshLayout`.
 - Image loading with Glide.
+- An empty state with a retry action when no news has been cached and the source is unavailable.
 
 ```text
 WordPress REST API / HTML page
@@ -33,8 +34,11 @@ To build from a terminal, run `./gradlew assembleDebug` on macOS/Linux or `.\gra
 - Java 17, Android SDK, and Material Components.
 - Retrofit and OkHttp for the REST API; Jsoup for the HTML fallback.
 - Room, `LiveData`, `RecyclerView`, and Glide.
-- Main source directory: `app/src/main/java/com/yourapp/stavelectroset/`.
+- Main source directory: `app/src/main/java/dev/musyase/stavelectroset/`.
+- Launcher icon source: `app/src/main/res/drawable/ic_launcher_foreground.xml`; run `python tools/build_icons.py` with Pillow installed to regenerate legacy icons.
 
 ## Current limits
 
 This is a news reader prototype, not a subscriber app. The source tree contains unfinished profile, registration, and admin screens that are outside the current user flow. Loading depends on the external site's availability and its current API or HTML markup. GitHub Actions builds `assembleDebug`; there are no automated UI tests yet.
+
+The first launch requires the news source to be reachable. If it is not, the app shows a retry action. After a successful load, Room keeps the fetched articles available offline.

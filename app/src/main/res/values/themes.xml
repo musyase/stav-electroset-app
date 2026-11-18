@@ -1,8 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.Stavelectroset" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/news_blue</item>
+        <item name="colorPrimaryDark">@color/news_blue_dark</item>
+        <item name="colorSurface">@color/news_surface</item>
+        <item name="android:colorBackground">@color/news_surface</item>
+        <item name="android:statusBarColor">@color/news_blue_dark</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.Stavelectroset" parent="Base.Theme.Stavelectroset" />

@@ -3,4 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="outline">#22000000</color>
+    <color name="news_blue">#234C70</color>
+    <color name="news_blue_dark">#173754</color>
+    <color name="news_surface">#F3F5F7</color>
 </resources>
