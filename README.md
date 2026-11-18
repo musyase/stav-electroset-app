@@ -1,42 +1,40 @@
-# Stav Electroset — Android news reader
+# Stav Electroset: Android news reader
 
-Небольшое Android-приложение для чтения новостей сайта [Ставропольских электрических сетей](https://stavels.ru/). Проект показывает работу с сетевым источником, локальным кэшем Room и Android UI на Java.
+This Java prototype reads news from the [Stavropol Electric Networks website](https://stavels.ru/). It loads articles from the WordPress REST API, falls back to parsing the news page when the API is unavailable, and stores fetched articles in Room for offline reading.
 
-## Что работает
+## What works
 
-- Главный экран со списком новостей (`RecyclerView`) и открытием статьи.
-- Загрузка публикаций через WordPress REST API; если API недоступен, загрузчик пробует разобрать страницу новостей.
-- Локальное хранение новостей в Room; интерфейс наблюдает за таблицей через `LiveData`.
-- Обновление списка жестом вниз (`SwipeRefreshLayout`).
-- Отображение изображений через Glide.
+- A news list in `RecyclerView` and an article view.
+- WordPress REST API loading with an HTML fallback.
+- Local Room storage observed by the UI through `LiveData`.
+- Pull to refresh with `SwipeRefreshLayout`.
+- Image loading with Glide.
 
 ```text
-WordPress REST API / HTML-страница
-              ↓
+WordPress REST API / HTML page
+              |
           NewsLoader
-              ↓
+              |
          NewsRepository
-              ↓
+              |
           Room / NewsDao
-              ↓
-     LiveData → RecyclerView
+              |
+     LiveData -> RecyclerView
 ```
 
-## Запуск
+## Run it
 
-1. Откройте проект в Android Studio с JDK 17 и Android SDK 35.
-2. Дождитесь синхронизации Gradle.
-3. Запустите конфигурацию `app` на эмуляторе или устройстве с Android 7.0 (API 24) или новее.
+Open the project in Android Studio with JDK 17 and Android SDK 35, let Gradle sync, then run the `app` configuration on an emulator or device with Android 7.0 (API 24) or newer.
 
-Из командной строки: `./gradlew assembleDebug` на macOS/Linux или `.\gradlew.bat assembleDebug` в PowerShell.
+To build from a terminal, run `./gradlew assembleDebug` on macOS/Linux or `.\gradlew.bat assembleDebug` in PowerShell.
 
-## Стек и устройство проекта
+## Code
 
-- Java 17, Android SDK, Material Components.
-- Retrofit и OkHttp для REST API, Jsoup для HTML fallback.
-- Room, `LiveData`, `RecyclerView`, Glide.
-- Основной код: `app/src/main/java/com/yourapp/stavelectroset/`.
+- Java 17, Android SDK, and Material Components.
+- Retrofit and OkHttp for the REST API; Jsoup for the HTML fallback.
+- Room, `LiveData`, `RecyclerView`, and Glide.
+- Main source directory: `app/src/main/java/com/yourapp/stavelectroset/`.
 
-## Текущее состояние
+## Current limits
 
-Это прототип новостного раздела, а не готовое приложение для абонентов. В дереве исходников есть заготовки профиля, регистрации и администрирования, но они не подключены к текущему пользовательскому сценарию. Работа зависит от доступности внешнего сайта и его текущей разметки/API. Сборка `assembleDebug` проверяется в GitHub Actions; автоматических UI-тестов пока нет.
+This is a news reader prototype, not a subscriber app. The source tree contains unfinished profile, registration, and admin screens that are outside the current user flow. Loading depends on the external site's availability and its current API or HTML markup. GitHub Actions builds `assembleDebug`; there are no automated UI tests yet.
